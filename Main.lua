@@ -1,8 +1,5 @@
 local p = game.Players
 local lp = p.LocalPlayer
-local oneshottoggle = false
-local customdmgtoggle = false
-local customdmgval = 0
 local requests = game.ReplicatedStorage.Requests
 local UIS = game:GetService('UserInputService')
 
@@ -50,6 +47,10 @@ function getevasive()
     return evasive
 end
 
+local oneshottoggle = false
+local customdmgtoggle = false
+local customdmgval = 0
+
 local hook;hook = hookmetamethod(game, "__namecall", function(self, ...)
     local method = getnamecallmethod()
     local args = {...}
@@ -58,7 +59,7 @@ local hook;hook = hookmetamethod(game, "__namecall", function(self, ...)
             args[2] = 99
         end
         if customdmgtoggle then
-            args[2] = customdmgval
+            args[2] = tonumber(customdmgval)
         end
     end
     return hook(self, unpack(args))
@@ -334,7 +335,7 @@ Iris:Connect(function()
                 local acis = Iris.Checkbox{"Allow Combat In Shrine"}.isChecked.value
                 local aoc = Iris.Checkbox{"Always Out Of Combat"}.isChecked.value
                 local tcd = Iris.Checkbox{"Custom M1 Damage Toggle"}.isChecked.value
-                local customdmg = Iris.InputNum{"Custom M1 Damage"}
+                local customdmg = Iris.InputNum{"Custom M1 Damage"}.number.value
                 Iris.Text{"If value is higher than or equal to HP then it wont register as a kill"}
                 customdmgtoggle = tcd
                 customdmgval = customdmg
