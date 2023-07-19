@@ -360,6 +360,7 @@ Iris:Connect(function()
                 if nocd then
                     if (lp.Character and lp.Character:FindFirstChild("StatusFolder")) then
                         if lp.Character.StatusFolder:FindFirstChild("AttackingCD") then
+                            input:FireServer("LightAttack")
                             lp.Character.StatusFolder.AttackingCD:Destroy()
                         end
                     end
