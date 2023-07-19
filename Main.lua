@@ -1,6 +1,10 @@
 local p = game.Players
 local lp = p.LocalPlayer
+local oneshottoggle = false
+local customdmgtoggle = false
+local customdmgval = 0
 local requests = game.ReplicatedStorage.Requests
+local UIS = game:GetService('UserInputService')
 
 function getplayer(name)
     local plrs = {}
@@ -31,9 +35,20 @@ function getinput(plr)
     return plr.Backpack:FindFirstChild("Input")
 end
 
-local oneshottoggle = false
-local customdmgtoggle = false
-local customdmgval = 0
+function getevasive()
+    local evasive
+    for i,v in pairs(lp.Backpack:GetDescendants()) do
+        if (v:IsA("StringValue") and v.Value == "Evasive") then
+            evasive = v.Parent
+        end
+    end
+    for i,v in pairs(lp.Character:GetDescendants()) do
+        if (v:IsA("StringValue") and v.Value == "Evasive") then
+            evasive = v.Parent
+        end
+    end
+    return evasive
+end
 
 local hook;hook = hookmetamethod(game, "__namecall", function(self, ...)
     local method = getnamecallmethod()
@@ -49,21 +64,231 @@ local hook;hook = hookmetamethod(game, "__namecall", function(self, ...)
     return hook(self, unpack(args))
 end)
 
+local Updates = [[
+    - Added Loadout Editor (Found in Local)
+    - Added Weapon/Skills Replacer (Found in Local)
+    - Added a toggle for GUI (Press 0 to toggle as right control is broken)
+]]
+local split = Updates:split("\n")
+table.remove(split,#split)
+
+local Window
+
 local Iris=loadstring(game:HttpGet("https://raw.githubusercontent.com/x0581/Iris-Exploit-Bundle/2.0.4/bundle.lua"))().Init(game.CoreGui)
 Iris:Connect(function()
-    local Window = Iris.Window({"Risk Of Roadblocks",false,false,true,false,true,false,true},{size=Iris.State(Vector2.new(1032,574)),position = Iris.State(Vector2.new(245,25))})
+    Window = Iris.Window({"Risk Of Roadblocks",false,false,true,false,true,false,true},{size=Iris.State(Vector2.new(1032,574)),position = Iris.State(Vector2.new(245,25))})
+        Iris.Tree{"Updates (New features added)"}
+            table.foreach(split,function(i,v)
+                Iris.Text{v}
+            end)
+        Iris.End()
         Iris.Tree{"Local"}
+            Iris.Tree{"Enchant List"}
+                for i,v in pairs(game.ReplicatedStorage.Assets.VFX.Enchants:GetChildren()) do
+                    Iris.Text{v.Name.." (Rarity: "..v:GetAttribute('Rarity')..")"}
+                end
+            Iris.End()
+            Iris.Tree{"Weapon List"}
+                for i,v in pairs(game.ReplicatedStorage.Assets.Weapons:GetChildren()) do
+                    Iris.Text{v.Name}
+                end
+            Iris.End()
+            Iris.Tree{"Evasive List"}
+                for i,v in pairs(game.ReplicatedStorage.Assets.Tools.Evasive:GetChildren()) do
+                    Iris.Text{v.Name}
+                end
+            Iris.End()
+            Iris.Tree{"Skills List"}
+                for i,v in pairs(game.ReplicatedStorage.Assets.Tools.Skills:GetChildren()) do
+                    Iris.Text{v.Name}
+                end
+            Iris.End()
+            Iris.Tree{"Loadout Editor"}
+                Iris.Table({1, [Iris.Args.Table.RowBg] = true})
+                    Iris.Text{"Loadout Weapon"}
+                    Iris.Text{lp.Data:GetAttribute("LoadoutWeapon")}
+                    Iris.SameLine()
+                        local val = Iris.InputText{"","Weapon Name"}.text.value
+                        if Iris.Button{"Set"}.clicked() then
+                            requests.GeneralEvent:FireServer("SaveLoadout",{LoadoutWeapon=val})
+                        end
+                    Iris.End()
+                    Iris.NextColumn()
+                    Iris.Text{"Loadout Skill 1"}
+                    Iris.Text{lp.Data:GetAttribute("LoadoutSkill1")}
+                    Iris.SameLine()
+                        local val = Iris.InputText{"","Skill Name"}.text.value
+                        if Iris.Button{"Set"}.clicked() then
+                            requests.GeneralEvent:FireServer("SaveLoadout",{LoadoutSkill1=val})
+                        end
+                    Iris.End()
+                    Iris.NextColumn()
+                    Iris.Text{"Loadout Skill 2"}
+                    Iris.Text{lp.Data:GetAttribute("LoadoutSkill2")}
+                    Iris.SameLine()
+                        local val = Iris.InputText{"","Skill Name"}.text.value
+                        if Iris.Button{"Set"}.clicked() then
+                            requests.GeneralEvent:FireServer("SaveLoadout",{LoadoutSkill2=val})
+                        end
+                    Iris.End()
+                    Iris.NextColumn()
+                    Iris.Text{"Loadout Skill 3"}
+                    Iris.Text{lp.Data:GetAttribute("LoadoutSkill3")}
+                    Iris.SameLine()
+                        local val = Iris.InputText{"","Skill Name"}.text.value
+                        if Iris.Button{"Set"}.clicked() then
+                            requests.GeneralEvent:FireServer("SaveLoadout",{LoadoutSkill3=val})
+                        end
+                    Iris.End()
+                    Iris.NextColumn()
+                    Iris.Text{"Loadout Evasive"}
+                    Iris.Text{lp.Data:GetAttribute("LoadoutEvasive")}
+                    Iris.SameLine()
+                        local val = Iris.InputText{"","Evasive Name"}.text.value
+                        if Iris.Button{"Set"}.clicked() then
+                            requests.GeneralEvent:FireServer("SaveLoadout",{LoadoutEvasive=val})
+                        end
+                    Iris.End()
+                Iris.End()
+                local cost = 0
+                local weapon = lp.Data:GetAttribute("LoadoutWeapon")
+                local skill = lp.Data:GetAttribute("LoadoutSkill1")
+                local skill1 = lp.Data:GetAttribute("LoadoutSkill2")
+                local skill2 = lp.Data:GetAttribute("LoadoutSkill2")
+                local evasive = lp.Data:GetAttribute("LoadoutEvasive")
+                if game.ReplicatedStorage.Assets.Weapons:FindFirstChild(weapon) then
+                    local newweap = game.ReplicatedStorage.Assets.Weapons[weapon]
+                    cost += newweap:GetAttribute("TokenCost")
+                end
+                if game.ReplicatedStorage.Assets.Tools.Skills:FindFirstChild(skill) then
+                    local newweap = game.ReplicatedStorage.Assets.Tools.Skills[skill]
+                    cost += newweap:GetAttribute("TokenCost")
+                end
+                if game.ReplicatedStorage.Assets.Tools.Skills:FindFirstChild(skill1) then
+                    local newweap = game.ReplicatedStorage.Assets.Tools.Skills[skill1]
+                    cost += newweap:GetAttribute("TokenCost")
+                end
+                if game.ReplicatedStorage.Assets.Tools.Skills:FindFirstChild(skill2) then
+                    local newweap = game.ReplicatedStorage.Assets.Tools.Skills[skill2]
+                    cost += newweap:GetAttribute("TokenCost")
+                end
+                if game.ReplicatedStorage.Assets.Tools.Evasive:FindFirstChild(evasive) then
+                    local newweap = game.ReplicatedStorage.Assets.Tools.Evasive[evasive]
+                    cost += newweap:GetAttribute("TokenCost")
+                end
+                Iris.Text{"Total cost: "..tostring(cost)}
+                if Iris.Button{"Buy current loadout with current tokens"}.clicked() then
+                    requests.GeneralEvent:FireServer("SummonLoadout")
+                end
+                if Iris.Button{"Buy current loadout without tokens"}.clicked() then
+                    requests.GeneralEvent:FireServer("SaveLoadout",{Tokens=(lp.Data:GetAttribute("Tokens")+cost)})
+                    requests.GeneralEvent:FireServer("SummonLoadout")
+                end
+            Iris.End()
+            Iris.Tree{"Weapon/Skill/Enchant Replacer"}
+                Iris.SameLine()
+                    Iris.Text{"Weapon"}
+                    local weapval = Iris.InputText{"","Weapon Name"}.text.value
+                    if Iris.Button{"Replace"}.clicked() then
+                        if game.ReplicatedStorage.Assets.Weapons:FindFirstChild(weapval) then
+                            local newweap = game.ReplicatedStorage.Assets.Weapons[weapval]
+                            requests.GeneralEvent:FireServer("SaveLoadout",{
+                                Tokens = (lp.Data:GetAttribute("Tokens")+newweap:GetAttribute("TokenCost")),
+                                LoadoutWeapon = weapval,
+                                LoadoutSkill1 = lp.Data:GetAttribute("LastSkill1"),
+                                LoadoutSkill2 = lp.Data:GetAttribute("LastSkill2"),
+                                LoadoutSkill3 = lp.Data:GetAttribute("LastSkill3"),
+                                LoadoutEvasive = getevasive(),
+                            })
+                            requests.GeneralEvent:FireServer("SummonLoadout")
+                        end
+                    end
+                Iris.End()
+                Iris.SameLine()
+                    Iris.Text{"Skill 1"}
+                    local skillval = Iris.InputText{"","Skill Name"}.text.value
+                    if Iris.Button{"Replace"}.clicked() then
+                        if game.ReplicatedStorage.Assets.Tools.Skills:FindFirstChild(skillval) then
+                            local newskill = game.ReplicatedStorage.Assets.Tools.Skills[skillval]
+                            requests.GeneralEvent:FireServer("SaveLoadout",{
+                                Tokens = (lp.Data:GetAttribute("Tokens")+newskill:GetAttribute("TokenCost")),
+                                LoadoutWeapon = lp.Data:GetAttribute("CurrentWeapon"),
+                                LoadoutSkill1 = skillval,
+                                LoadoutSkill2 = lp.Data:GetAttribute("LastSkill2"),
+                                LoadoutSkill3 = lp.Data:GetAttribute("LastSkill3"),
+                                LoadoutEvasive = getevasive(),
+                            })
+                            requests.GeneralEvent:FireServer("SummonLoadout")
+                        end
+                    end
+                Iris.End()
+                Iris.SameLine()
+                    Iris.Text{"Skill 2"}
+                    local skillval = Iris.InputText{"","Skill Name"}.text.value
+                    if Iris.Button{"Replace"}.clicked() then
+                        if game.ReplicatedStorage.Assets.Tools.Skills:FindFirstChild(skillval) then
+                            local newskill = game.ReplicatedStorage.Assets.Tools.Skills[skillval]
+                            requests.GeneralEvent:FireServer("SaveLoadout",{
+                                Tokens = (lp.Data:GetAttribute("Tokens")+newskill:GetAttribute("TokenCost")),
+                                LoadoutWeapon = lp.Data:GetAttribute("CurrentWeapon"),
+                                LoadoutSkill1 = lp.Data:GetAttribute("LastSkill1"),
+                                LoadoutSkill2 = skillval,
+                                LoadoutSkill3 = lp.Data:GetAttribute("LastSkill3"),
+                                LoadoutEvasive = getevasive(),
+                            })
+                            requests.GeneralEvent:FireServer("SummonLoadout")
+                        end
+                    end
+                Iris.End()
+                Iris.SameLine()
+                    Iris.Text{"Skill 3"}
+                    local skillval = Iris.InputText{"","Skill Name"}.text.value
+                    if Iris.Button{"Replace"}.clicked() then
+                        if game.ReplicatedStorage.Assets.Tools.Skills:FindFirstChild(skillval) then
+                            local newskill = game.ReplicatedStorage.Assets.Tools.Skills[skillval]
+                            requests.GeneralEvent:FireServer("SaveLoadout",{
+                                Tokens = (lp.Data:GetAttribute("Tokens")+newskill:GetAttribute("TokenCost")),
+                                LoadoutWeapon = lp.Data:GetAttribute("CurrentWeapon"),
+                                LoadoutSkill1 = lp.Data:GetAttribute("LastSkill1"),
+                                LoadoutSkill2 = lp.Data:GetAttribute("LastSkill2"),
+                                LoadoutSkill3 = skillval,
+                                LoadoutEvasive = getevasive(),
+                            })
+                            requests.GeneralEvent:FireServer("SummonLoadout")
+                        end
+                    end
+                Iris.End()
+                Iris.SameLine()
+                    Iris.Text{"Evasive"}
+                    local evasiveval = Iris.InputText{"","Evasive Name"}.text.value
+                    if Iris.Button{"Replace"}.clicked() then
+                        if game.ReplicatedStorage.Assets.Tools.Evasive:FindFirstChild(evasiveval) then
+                            local newevasive = game.ReplicatedStorage.Assets.Tools.Evasive[evasiveval]
+                            requests.GeneralEvent:FireServer("SaveLoadout",{
+                                Tokens = (lp.Data:GetAttribute("Tokens")+newevasive:GetAttribute("TokenCost")),
+                                LoadoutWeapon = lp.Data:GetAttribute("CurrentWeapon"),
+                                LoadoutSkill1 = lp.Data:GetAttribute("LastSkill1"),
+                                LoadoutSkill2 = lp.Data:GetAttribute("LastSkill2"),
+                                LoadoutSkill3 = lp.Data:GetAttribute("LastSkill3"),
+                                LoadoutEvasive = evasiveval,
+                            })
+                            requests.GeneralEvent:FireServer("SummonLoadout")
+                        end
+                    end
+                Iris.End()
+                Iris.SameLine()
+                    Iris.Text{"Enchant"}
+                    local enchantval = Iris.InputText{"","Enchant Name"}.text.value
+                    if Iris.Button{"Replace"}.clicked() then
+                        if game.ReplicatedStorage.Assets.VFX.Enchants:FindFirstChild(enchantval) then
+                            requests.GeneralEvent:FireServer("SaveLoadout",{
+                                Enchant = enchantval
+                            })
+                        end
+                    end
+                Iris.End()
+            Iris.End()
             Iris.Tree{"Data Changer"}
-                Iris.Tree{"Enchant List"}
-                    for i,v in pairs(game.ReplicatedStorage.Assets.VFX.Enchants:GetChildren()) do
-                        Iris.Text{v.Name.." - "..v:GetAttribute('Rarity')}
-                    end
-                Iris.End()
-                Iris.Tree{"Weapon List"}
-                    for i,v in pairs(game.ReplicatedStorage.Assets.Weapons:GetChildren()) do
-                        Iris.Text{v.Name.." - "..v:GetAttribute('WeaponCategory')}
-                    end
-                Iris.End()
                 local Attributes = lp.Data:GetAttributes()
                 for i,v in pairs(Attributes) do
                     Iris.SameLine()
@@ -233,5 +458,13 @@ Iris:Connect(function()
     Iris.End()
     if Window.isOpened.value == false then
         Iris.Checkbox({"Open"}, {isChecked = Window.isOpened})
+    end
+end)
+
+repeat task.wait() until Window
+UIS.InputBegan:Connect(function(i,gp)
+    if gp then return end
+    if i.KeyCode == Enum.KeyCode.Zero then
+        Window.state.isOpened:set(not Window.state.isOpened.value)
     end
 end)
