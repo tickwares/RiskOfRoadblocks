@@ -68,7 +68,6 @@ local Updates = [[
     - Added Loadout Editor (Found in Local)
     - Added Weapon/Skills Replacer (Found in Local)
     - Added a toggle for GUI (Press 0 to toggle as right control is broken)
-    - Fixed replacer
 ]]
 local split = Updates:split("\n")
 table.remove(split,#split)
@@ -192,9 +191,8 @@ Iris:Connect(function()
                     local weapval = Iris.InputText{"","Weapon Name"}.text.value
                     if Iris.Button{"Replace"}.clicked() then
                         if game.ReplicatedStorage.Assets.Weapons:FindFirstChild(weapval) then
-                            local newweap = game.ReplicatedStorage.Assets.Weapons[weapval]
                             requests.GeneralEvent:FireServer("SaveLoadout",{
-                                Tokens = (lp.Data:GetAttribute("Tokens")+newweap:GetAttribute("TokenCost")),
+                                Tokens = (lp.Data:GetAttribute("Tokens")+cost),
                                 LoadoutWeapon = weapval,
                                 LoadoutSkill1 = lp.Data:GetAttribute("LastSkill1"),
                                 LoadoutSkill2 = lp.Data:GetAttribute("LastSkill2"),
@@ -211,9 +209,8 @@ Iris:Connect(function()
                     local skillval = Iris.InputText{"","Skill Name"}.text.value
                     if Iris.Button{"Replace"}.clicked() then
                         if game.ReplicatedStorage.Assets.Tools.Skills:FindFirstChild(skillval) then
-                            local newskill = game.ReplicatedStorage.Assets.Tools.Skills[skillval]
                             requests.GeneralEvent:FireServer("SaveLoadout",{
-                                Tokens = (lp.Data:GetAttribute("Tokens")+newskill:GetAttribute("TokenCost")),
+                                Tokens = (lp.Data:GetAttribute("Tokens")+cost),
                                 LoadoutWeapon = lp.Data:GetAttribute("CurrentWeapon"),
                                 LoadoutSkill1 = skillval,
                                 LoadoutSkill2 = lp.Data:GetAttribute("LastSkill2"),
@@ -231,9 +228,8 @@ Iris:Connect(function()
                     local skillval = Iris.InputText{"","Skill Name"}.text.value
                     if Iris.Button{"Replace"}.clicked() then
                         if game.ReplicatedStorage.Assets.Tools.Skills:FindFirstChild(skillval) then
-                            local newskill = game.ReplicatedStorage.Assets.Tools.Skills[skillval]
                             requests.GeneralEvent:FireServer("SaveLoadout",{
-                                Tokens = (lp.Data:GetAttribute("Tokens")+newskill:GetAttribute("TokenCost")),
+                                Tokens = (lp.Data:GetAttribute("Tokens")+cost),
                                 LoadoutWeapon = lp.Data:GetAttribute("CurrentWeapon"),
                                 LoadoutSkill1 = lp.Data:GetAttribute("LastSkill1"),
                                 LoadoutSkill2 = skillval,
@@ -251,9 +247,8 @@ Iris:Connect(function()
                     local skillval = Iris.InputText{"","Skill Name"}.text.value
                     if Iris.Button{"Replace"}.clicked() then
                         if game.ReplicatedStorage.Assets.Tools.Skills:FindFirstChild(skillval) then
-                            local newskill = game.ReplicatedStorage.Assets.Tools.Skills[skillval]
                             requests.GeneralEvent:FireServer("SaveLoadout",{
-                                Tokens = (lp.Data:GetAttribute("Tokens")+newskill:GetAttribute("TokenCost")),
+                                Tokens = (lp.Data:GetAttribute("Tokens")+cost),
                                 LoadoutWeapon = lp.Data:GetAttribute("CurrentWeapon"),
                                 LoadoutSkill1 = lp.Data:GetAttribute("LastSkill1"),
                                 LoadoutSkill2 = lp.Data:GetAttribute("LastSkill2"),
@@ -271,9 +266,8 @@ Iris:Connect(function()
                     local evasiveval = Iris.InputText{"","Evasive Name"}.text.value
                     if Iris.Button{"Replace"}.clicked() then
                         if game.ReplicatedStorage.Assets.Tools.Evasive:FindFirstChild(evasiveval) then
-                            local newevasive = game.ReplicatedStorage.Assets.Tools.Evasive[evasiveval]
                             requests.GeneralEvent:FireServer("SaveLoadout",{
-                                Tokens = (lp.Data:GetAttribute("Tokens")+newevasive:GetAttribute("TokenCost")),
+                                Tokens = (lp.Data:GetAttribute("Tokens")+cost),
                                 LoadoutWeapon = lp.Data:GetAttribute("CurrentWeapon"),
                                 LoadoutSkill1 = lp.Data:GetAttribute("LastSkill1"),
                                 LoadoutSkill2 = lp.Data:GetAttribute("LastSkill2"),
