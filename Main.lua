@@ -357,18 +357,21 @@ Iris:Connect(function()
                         end
                     end
                 end
+                if noccd then
+                    if (lp.Character and lp.Character:FindFirstChild("StatusFolder")) then
+                        if lp.Character.StatusFolder:FindFirstChild("CriticalCD") then
+                            lp.Character.StatusFolder.CriticalCD:Destroy()
+                        end
+                        if lp.Character.StatusFolder:FindFirstChild("UsingSkill") then
+                            lp.Character.StatusFolder.UsingSkill:Destroy()
+                        end
+                    end
+                end
                 if nocd then
                     if (lp.Character and lp.Character:FindFirstChild("StatusFolder")) then
                         if lp.Character.StatusFolder:FindFirstChild("AttackingCD") then
                             input:FireServer("LightAttack",0)
                             lp.Character.StatusFolder.AttackingCD:Destroy()
-                        end
-                    end
-                end
-                if noccd then
-                    if (lp.Character and lp.Character:FindFirstChild("StatusFolder")) then
-                        if lp.Character.StatusFolder:FindFirstChild("CriticalCD") then
-                            lp.Character.StatusFolder.CriticalCD:Destroy()
                         end
                     end
                 end
