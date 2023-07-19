@@ -68,6 +68,7 @@ local Updates = [[
     - Added Loadout Editor (Found in Local)
     - Added Weapon/Skills Replacer (Found in Local)
     - Added a toggle for GUI (Press 0 to toggle as right control is broken)
+    - Fixed replacer not working
 ]]
 local split = Updates:split("\n")
 table.remove(split,#split)
@@ -200,6 +201,7 @@ Iris:Connect(function()
                                 LoadoutSkill3 = lp.Data:GetAttribute("LastSkill3"),
                                 LoadoutEvasive = getevasive(),
                             })
+                            task.wait()
                             requests.GeneralEvent:FireServer("SummonLoadout")
                         end
                     end
@@ -218,6 +220,7 @@ Iris:Connect(function()
                                 LoadoutSkill3 = lp.Data:GetAttribute("LastSkill3"),
                                 LoadoutEvasive = getevasive(),
                             })
+                            task.wait()
                             requests.GeneralEvent:FireServer("SummonLoadout")
                         end
                     end
@@ -236,6 +239,7 @@ Iris:Connect(function()
                                 LoadoutSkill3 = lp.Data:GetAttribute("LastSkill3"),
                                 LoadoutEvasive = getevasive(),
                             })
+                            task.wait()
                             requests.GeneralEvent:FireServer("SummonLoadout")
                         end
                     end
@@ -254,6 +258,7 @@ Iris:Connect(function()
                                 LoadoutSkill3 = skillval,
                                 LoadoutEvasive = getevasive(),
                             })
+                            task.wait()
                             requests.GeneralEvent:FireServer("SummonLoadout")
                         end
                     end
@@ -272,6 +277,7 @@ Iris:Connect(function()
                                 LoadoutSkill3 = lp.Data:GetAttribute("LastSkill3"),
                                 LoadoutEvasive = evasiveval,
                             })
+                            task.wait()
                             requests.GeneralEvent:FireServer("SummonLoadout")
                         end
                     end
