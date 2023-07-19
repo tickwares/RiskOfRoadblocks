@@ -68,7 +68,7 @@ local Updates = [[
     - Added Loadout Editor (Found in Local)
     - Added Weapon/Skills Replacer (Found in Local)
     - Added a toggle for GUI (Press 0 to toggle as right control is broken)
-    - Fixed replacer not working
+    - Fixed replacer
 ]]
 local split = Updates:split("\n")
 table.remove(split,#split)
@@ -219,6 +219,7 @@ Iris:Connect(function()
                                 LoadoutSkill2 = lp.Data:GetAttribute("LastSkill2"),
                                 LoadoutSkill3 = lp.Data:GetAttribute("LastSkill3"),
                                 LoadoutEvasive = getevasive(),
+                                LastSkill1 = skillval
                             })
                             task.wait()
                             requests.GeneralEvent:FireServer("SummonLoadout")
@@ -238,6 +239,7 @@ Iris:Connect(function()
                                 LoadoutSkill2 = skillval,
                                 LoadoutSkill3 = lp.Data:GetAttribute("LastSkill3"),
                                 LoadoutEvasive = getevasive(),
+                                LastSkill2 = skillval
                             })
                             task.wait()
                             requests.GeneralEvent:FireServer("SummonLoadout")
@@ -257,6 +259,7 @@ Iris:Connect(function()
                                 LoadoutSkill2 = lp.Data:GetAttribute("LastSkill2"),
                                 LoadoutSkill3 = skillval,
                                 LoadoutEvasive = getevasive(),
+                                LastSkill3 = skillval
                             })
                             task.wait()
                             requests.GeneralEvent:FireServer("SummonLoadout")
