@@ -50,10 +50,16 @@ end
 local oneshottoggle = false
 local customdmgtoggle = false
 local customdmgval = 0
+local noheavy
 
 local hook;hook = hookmetamethod(game, "__namecall", function(self, ...)
     local method = getnamecallmethod()
     local args = {...}
+    if (self.Name == "Input" and args[1] == "HeavyAttack" and method == "FireServer") then
+        if noheavy then
+            args[1] = "LightAttack"
+        end
+    end
     if (self.Name == "Input" and args[1] == "LightAttack" and args[3] ~= "syn" and method == "FireServer") then
         if oneshottoggle then
             args[2] = 99
@@ -69,6 +75,7 @@ local Updates = [[
     - Added Loadout Editor (Found in Local)
     - Added Weapon/Skills Replacer (Found in Local)
     - Added a toggle for GUI (Press 0 to toggle as right control is broken)
+    - Added No Heavy M1 Knockback
 ]]
 local split = Updates:split("\n")
 table.remove(split,#split)
@@ -325,6 +332,7 @@ Iris:Connect(function()
             Iris.Tree{"Main"}
                 local input = getinput(lp)
                 local oneshot = Iris.Checkbox{"Oneshot M1s (Can be twoshot at some point)"}.isChecked.value
+                local heavyknockback = Iris.Checkbox{"No Heavy M1 Knockback"}.isChecked.value
                 local nocd = Iris.Checkbox{"No M1s Cooldown"}.isChecked.value
                 local noccd = Iris.Checkbox{"No Critical Cooldown"}.isChecked.value
                 local nosc = Iris.Checkbox{"No Speed Controller"}.isChecked.value
@@ -340,6 +348,7 @@ Iris:Connect(function()
                 customdmgtoggle = tcd
                 customdmgval = customdmg
                 oneshottoggle = oneshot
+                noheavy = heavyknockback
                 if oneshot then
                     if (lp.Character and lp.Character:FindFirstChild("StatusFolder")) then
                         if lp.Character.StatusFolder:FindFirstChild("Attacking") then
