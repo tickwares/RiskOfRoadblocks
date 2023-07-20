@@ -72,10 +72,7 @@ local hook;hook = hookmetamethod(game, "__namecall", function(self, ...)
 end)
 
 local Updates = [[
-    - Added Loadout Editor (Found in Local)
-    - Added Weapon/Skills Replacer (Found in Local)
-    - Added a toggle for GUI (Press 0 to toggle as right control is broken)
-    - Added No Heavy M1 Knockback
+    - Added Semi-godmode (can survive oneshot)
 ]]
 local split = Updates:split("\n")
 table.remove(split,#split)
@@ -331,6 +328,7 @@ Iris:Connect(function()
             Iris.End()
             Iris.Tree{"Main"}
                 local input = getinput(lp)
+                local godmode = Iris.Checkbox{"Semi God-mode"}.isChecked.value
                 local oneshot = Iris.Checkbox{"Oneshot M1s (Can be twoshot at some point)"}.isChecked.value
                 local heavyknockback = Iris.Checkbox{"No Heavy M1 Knockback"}.isChecked.value
                 local nocd = Iris.Checkbox{"No M1s Cooldown"}.isChecked.value
@@ -349,6 +347,30 @@ Iris:Connect(function()
                 customdmgval = customdmg
                 oneshottoggle = oneshot
                 noheavy = heavyknockback
+                if godmode then
+                    if (lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")) then
+                        for i,v in pairs(workspace.Alive:GetChildren()) do
+                            local playerinst = p:GetPlayerFromCharacter(v)
+                            local root = v:FindFirstChild("HumanoidRootPart")
+                            if (root and playerinst ~= lp) then
+                                local offset = root.CFrame*CFrame.new(0,0,-5)
+                                local min = offset.Position - (0.5 * Vector3.new(5,5,5))
+                                local max = offset.Position + (0.5 * Vector3.new(5,5,5))
+                                local region3 = Region3.new(min,max)
+                                local parts = workspace:FindPartsInRegion3(region3,nil,5)
+                                for _,g in pairs(parts) do
+                                    if (g.Name == "HumanoidRootPart" and lp.Character.Humanoid.Health < 100) then
+                                        local input = getinput(playerinst)
+                                        if input then
+                                            input:FireServer("LightAttack",-9e9,nil,false)
+                                            break
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
                 if oneshot then
                     if (lp.Character and lp.Character:FindFirstChild("StatusFolder")) then
                         if lp.Character.StatusFolder:FindFirstChild("Attacking") then
